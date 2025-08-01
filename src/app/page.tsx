@@ -3,6 +3,7 @@
 import { ChangeEvent, useEffect, useState } from "react";
 
 export default function Home() {
+  const [searchInput, setSearchInput] = useState("");
   const [advocates, setAdvocates] = useState<AdvocateEntity[]>([]);
   const [filteredAdvocates, setFilteredAdvocates] = useState<AdvocateEntity[]>(
     []
@@ -19,16 +20,20 @@ export default function Home() {
   }, []);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const searchTerm = e.target.value;
+    const searchTerm = e.target.value.toLowerCase();
+    setSearchInput(searchTerm);
 
     console.log("filtering advocates...");
     const filteredAdvocates = advocates.filter((advocate) => {
       return (
-        advocate.firstName.includes(searchTerm) ||
-        advocate.lastName.includes(searchTerm) ||
-        advocate.city.includes(searchTerm) ||
-        advocate.degree.includes(searchTerm) ||
-        advocate.specialties.includes(searchTerm) ||
+        advocate.firstName.toLowerCase().includes(searchTerm) ||
+        advocate.lastName.toLowerCase().includes(searchTerm) ||
+        advocate.city.toLowerCase().includes(searchTerm) ||
+        advocate.degree.toLowerCase().includes(searchTerm) ||
+        advocate.phoneNumber.toString().includes(searchTerm) ||
+        !!advocate.specialties.find((s) =>
+          s.toLowerCase().includes(searchTerm)
+        ) ||
         advocate.yearsOfExperience.toString().includes(searchTerm)
       );
     });
@@ -36,10 +41,13 @@ export default function Home() {
     setFilteredAdvocates(filteredAdvocates);
   };
 
-  const onClick = () => {
+  const onReset = () => {
     console.log(advocates);
+    setSearchInput("");
     setFilteredAdvocates(advocates);
   };
+
+  const onSearch = () => {};
 
   return (
     <main style={{ margin: "24px" }}>
@@ -49,10 +57,16 @@ export default function Home() {
       <div>
         <p>Search</p>
         <p>
-          Searching for: <span id="search-term"></span>
+          Searching for: <span>{searchInput}</span>
         </p>
-        <input style={{ border: "1px solid black" }} onChange={onChange} />
-        <button onClick={onClick}>Reset Search</button>
+        <input
+          type="text"
+          style={{ border: "1px solid black" }}
+          value={searchInput}
+          onChange={onChange}
+        />
+        <button onClick={onReset}>Reset</button>
+        <button onClick={onSearch}>Search</button>
       </div>
       <br />
       <br />
