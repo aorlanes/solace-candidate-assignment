@@ -13,16 +13,19 @@ import {
   Typography,
   Box,
   ThemeProvider,
+  TablePagination,
 } from "@mui/material";
 import { ChangeEvent, useEffect, useState } from "react";
 import theme from "./theme";
 
 export default function Home() {
+  const rowsPerPage = 10;
   const [searchInput, setSearchInput] = useState("");
   const [advocates, setAdvocates] = useState<AdvocateEntity[]>([]);
   const [filteredAdvocates, setFilteredAdvocates] = useState<AdvocateEntity[]>(
     []
   );
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
     console.log("fetching advocates...");
@@ -63,6 +66,10 @@ export default function Home() {
   };
 
   const onSearch = () => {};
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -134,33 +141,73 @@ export default function Home() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredAdvocates.map((advocate) => (
-                <TableRow
-                  key={advocate.id}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    {advocate.firstName}
-                  </TableCell>
-                  <TableCell align="left">{advocate.lastName}</TableCell>
-                  <TableCell align="left">{advocate.city}</TableCell>
-                  <TableCell align="left">{advocate.degree}</TableCell>
-                  <TableCell align="left">
-                    {advocate.specialties.map((specialty, i) => (
-                      <Typography key={`${specialty}-${i}`}>
-                        • {specialty}
-                      </Typography>
-                    ))}
-                  </TableCell>
-                  <TableCell align="left">
-                    {advocate.yearsOfExperience}
-                  </TableCell>
-                  <TableCell align="left">{advocate.phoneNumber}</TableCell>
-                </TableRow>
-              ))}
+              {filteredAdvocates
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((advocate) => (
+                  <TableRow
+                    key={advocate.id}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      style={{ verticalAlign: "text-top" }}
+                    >
+                      {advocate.firstName}
+                    </TableCell>
+                    <TableCell
+                      align="left"
+                      style={{ verticalAlign: "text-top" }}
+                    >
+                      {advocate.lastName}
+                    </TableCell>
+                    <TableCell
+                      align="left"
+                      style={{ verticalAlign: "text-top" }}
+                    >
+                      {advocate.city}
+                    </TableCell>
+                    <TableCell
+                      align="left"
+                      style={{ verticalAlign: "text-top" }}
+                    >
+                      {advocate.degree}
+                    </TableCell>
+                    <TableCell
+                      align="left"
+                      style={{ verticalAlign: "text-top" }}
+                    >
+                      {advocate.specialties.map((specialty, i) => (
+                        <Typography key={`${specialty}-${i}`}>
+                          • {specialty}
+                        </Typography>
+                      ))}
+                    </TableCell>
+                    <TableCell
+                      align="left"
+                      style={{ verticalAlign: "text-top" }}
+                    >
+                      {advocate.yearsOfExperience}
+                    </TableCell>
+                    <TableCell
+                      align="left"
+                      style={{ verticalAlign: "text-top" }}
+                    >
+                      {advocate.phoneNumber}
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[rowsPerPage]}
+          component="div"
+          count={filteredAdvocates.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+        />
       </main>
     </ThemeProvider>
   );
