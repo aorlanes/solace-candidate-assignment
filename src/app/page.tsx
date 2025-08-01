@@ -67,7 +67,7 @@ export default function Home() {
 
   const onSearch = () => {};
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
   };
 
@@ -143,9 +143,9 @@ export default function Home() {
             <TableBody>
               {filteredAdvocates
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((advocate) => (
+                .map((advocate, index) => (
                   <TableRow
-                    key={advocate.id}
+                    key={`${advocate.id}-${index}`}
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell
