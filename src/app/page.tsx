@@ -1,6 +1,21 @@
 "use client";
 
+import {
+  TableContainer,
+  Paper,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Table,
+  Button,
+  TextField,
+  Typography,
+  Box,
+  ThemeProvider,
+} from "@mui/material";
 import { ChangeEvent, useEffect, useState } from "react";
+import theme from "./theme";
 
 export default function Home() {
   const [searchInput, setSearchInput] = useState("");
@@ -50,58 +65,103 @@ export default function Home() {
   const onSearch = () => {};
 
   return (
-    <main style={{ margin: "24px" }}>
-      <h1>Solace Advocates</h1>
-      <br />
-      <br />
-      <div>
-        <p>Search</p>
-        <p>
-          Searching for: <span>{searchInput}</span>
-        </p>
-        <input
-          type="text"
-          style={{ border: "1px solid black" }}
-          value={searchInput}
-          onChange={onChange}
-        />
-        <button onClick={onReset}>Reset</button>
-        <button onClick={onSearch}>Search</button>
-      </div>
-      <br />
-      <br />
-      <table>
-        <thead>
-          <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>City</th>
-            <th>Degree</th>
-            <th>Specialties</th>
-            <th>Years of Experience</th>
-            <th>Phone Number</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredAdvocates.map((advocate, index) => {
-            return (
-              <tr key={`${advocate.id}-${index}`}>
-                <td>{advocate.firstName}</td>
-                <td>{advocate.lastName}</td>
-                <td>{advocate.city}</td>
-                <td>{advocate.degree}</td>
-                <td>
-                  {advocate.specialties.map((specialty, i) => (
-                    <div key={`${specialty}-${i}`}>{specialty}</div>
-                  ))}
-                </td>
-                <td>{advocate.yearsOfExperience}</td>
-                <td>{advocate.phoneNumber}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </main>
+    <ThemeProvider theme={theme}>
+      <main style={{ margin: "24px" }}>
+        <Typography variant="h1">Solace Advocates</Typography>
+        <br />
+        <br />
+        <Box
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="h2">Search</Typography>
+          <Box style={{ alignSelf: "flex-start" }}>
+            <Typography style={{ paddingBottom: 8 }}>
+              Searching for: {searchInput}
+            </Typography>
+            <TextField
+              label="Search"
+              className="border"
+              value={searchInput}
+              onChange={onChange}
+              variant="outlined"
+            />
+            <Button
+              variant="text"
+              onClick={onReset}
+              style={{ margin: 12, color: "#1d4339" }}
+            >
+              Reset
+            </Button>
+            <Button
+              variant="contained"
+              style={{ background: "#1d4339" }}
+              onClick={onSearch}
+            >
+              Search
+            </Button>
+          </Box>
+        </Box>
+        <br />
+        <br />
+
+        <TableContainer component={Paper}>
+          <Table aria-label="simple table">
+            <TableHead className="bg-[#1d4339]">
+              <TableRow>
+                <TableCell style={{ color: "white" }}>First Name</TableCell>
+                <TableCell align="left" style={{ color: "white" }}>
+                  Last Name
+                </TableCell>
+                <TableCell align="left" style={{ color: "white" }}>
+                  City
+                </TableCell>
+                <TableCell align="left" style={{ color: "white" }}>
+                  Degree
+                </TableCell>
+                <TableCell align="left" style={{ color: "white" }}>
+                  Specialties
+                </TableCell>
+                <TableCell align="left" style={{ color: "white" }}>
+                  Years of Experience
+                </TableCell>
+                <TableCell align="left" style={{ color: "white" }}>
+                  Phone Number
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredAdvocates.map((advocate) => (
+                <TableRow
+                  key={advocate.id}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {advocate.firstName}
+                  </TableCell>
+                  <TableCell align="left">{advocate.lastName}</TableCell>
+                  <TableCell align="left">{advocate.city}</TableCell>
+                  <TableCell align="left">{advocate.degree}</TableCell>
+                  <TableCell align="left">
+                    {advocate.specialties.map((specialty, i) => (
+                      <Typography key={`${specialty}-${i}`}>
+                        • {specialty}
+                      </Typography>
+                    ))}
+                  </TableCell>
+                  <TableCell align="left">
+                    {advocate.yearsOfExperience}
+                  </TableCell>
+                  <TableCell align="left">{advocate.phoneNumber}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </main>
+    </ThemeProvider>
   );
 }
