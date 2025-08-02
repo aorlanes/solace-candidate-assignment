@@ -1,3 +1,12 @@
+# :warning: **Note to Reviewers** :warning:
+:warning: I made the mistake of explaining my changes in **Commits** instead of **PRs**. Please view my changes under "Commits". :warning:
+
+
+
+
+
+
+
 ## Solace Candidate Assignment
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
