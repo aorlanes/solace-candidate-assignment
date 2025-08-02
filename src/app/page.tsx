@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import { ChangeEvent, useEffect, useState } from "react";
 import theme from "./theme";
+import { useGetAdvocates } from "./hooks/AdvocateHooks";
 
 export default function Home() {
   const rowsPerPage = 10;
@@ -26,46 +27,43 @@ export default function Home() {
     []
   );
   const [page, setPage] = useState(0);
+  const [initialFetch, setInitialFetch] = useState(true);
+
+  const { data, count, request } = useGetAdvocates();
 
   useEffect(() => {
-    console.log("fetching advocates...");
-    fetch("/api/advocates").then((response) => {
-      response.json().then((jsonResponse) => {
-        setAdvocates(jsonResponse.data);
-        setFilteredAdvocates(jsonResponse.data);
-      });
-    });
-  }, []);
+    if (initialFetch) {
+      request(searchInput, page);
+    }
+  }, [initialFetch]);
+
+  useEffect(() => {
+    if (data) {
+      setInitialFetch(false);
+      setAdvocates(data);
+      setFilteredAdvocates(data);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    request(searchInput, page);
+  }, [page]);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const searchTerm = e.target.value.toLowerCase();
+    const searchTerm = e.target.value;
     setSearchInput(searchTerm);
-
-    console.log("filtering advocates...");
-    const filteredAdvocates = advocates.filter((advocate) => {
-      return (
-        advocate.firstName.toLowerCase().includes(searchTerm) ||
-        advocate.lastName.toLowerCase().includes(searchTerm) ||
-        advocate.city.toLowerCase().includes(searchTerm) ||
-        advocate.degree.toLowerCase().includes(searchTerm) ||
-        advocate.phoneNumber.toString().includes(searchTerm) ||
-        !!advocate.specialties.find((s) =>
-          s.toLowerCase().includes(searchTerm)
-        ) ||
-        advocate.yearsOfExperience.toString().includes(searchTerm)
-      );
-    });
-
-    setFilteredAdvocates(filteredAdvocates);
   };
 
   const onReset = () => {
-    console.log(advocates);
     setSearchInput("");
-    setFilteredAdvocates(advocates);
+    setPage(0);
+    request("", 0);
   };
 
-  const onSearch = () => {};
+  const onSearch = () => {
+    setPage(0);
+    request(searchInput, 0);
+  };
 
   const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
@@ -141,69 +139,49 @@ export default function Home() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredAdvocates
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((advocate, index) => (
-                  <TableRow
-                    key={`${advocate.id}-${index}`}
-                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              {filteredAdvocates.map((advocate, index) => (
+                <TableRow
+                  key={`${advocate.id}-${index}`}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell
+                    component="th"
+                    scope="row"
+                    style={{ verticalAlign: "text-top" }}
                   >
-                    <TableCell
-                      component="th"
-                      scope="row"
-                      style={{ verticalAlign: "text-top" }}
-                    >
-                      {advocate.firstName}
-                    </TableCell>
-                    <TableCell
-                      align="left"
-                      style={{ verticalAlign: "text-top" }}
-                    >
-                      {advocate.lastName}
-                    </TableCell>
-                    <TableCell
-                      align="left"
-                      style={{ verticalAlign: "text-top" }}
-                    >
-                      {advocate.city}
-                    </TableCell>
-                    <TableCell
-                      align="left"
-                      style={{ verticalAlign: "text-top" }}
-                    >
-                      {advocate.degree}
-                    </TableCell>
-                    <TableCell
-                      align="left"
-                      style={{ verticalAlign: "text-top" }}
-                    >
-                      {advocate.specialties.map((specialty, i) => (
-                        <Typography key={`${specialty}-${i}`}>
-                          • {specialty}
-                        </Typography>
-                      ))}
-                    </TableCell>
-                    <TableCell
-                      align="left"
-                      style={{ verticalAlign: "text-top" }}
-                    >
-                      {advocate.yearsOfExperience}
-                    </TableCell>
-                    <TableCell
-                      align="left"
-                      style={{ verticalAlign: "text-top" }}
-                    >
-                      {advocate.phoneNumber}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                    {advocate.firstName}
+                  </TableCell>
+                  <TableCell align="left" style={{ verticalAlign: "text-top" }}>
+                    {advocate.lastName}
+                  </TableCell>
+                  <TableCell align="left" style={{ verticalAlign: "text-top" }}>
+                    {advocate.city}
+                  </TableCell>
+                  <TableCell align="left" style={{ verticalAlign: "text-top" }}>
+                    {advocate.degree}
+                  </TableCell>
+                  <TableCell align="left" style={{ verticalAlign: "text-top" }}>
+                    {advocate.specialties.map((specialty, i) => (
+                      <Typography key={`${specialty}-${i}`}>
+                        • {specialty}
+                      </Typography>
+                    ))}
+                  </TableCell>
+                  <TableCell align="left" style={{ verticalAlign: "text-top" }}>
+                    {advocate.yearsOfExperience}
+                  </TableCell>
+                  <TableCell align="left" style={{ verticalAlign: "text-top" }}>
+                    {advocate.phoneNumber}
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
           rowsPerPageOptions={[rowsPerPage]}
           component="div"
-          count={filteredAdvocates.length}
+          count={count}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
